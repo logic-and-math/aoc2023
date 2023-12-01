@@ -19,7 +19,7 @@ main() {
   int lineValue(String line, {required bool onlyNumbers}) {
     final toMatch = nameToDigit.values.map((e) => e.toString()).toList();
     if (!onlyNumbers) {
-      toMatch.addAll(nameToDigit.keys.toList());
+      toMatch.addAll(nameToDigit.keys);
     }
 
     final firstMatch = toMatch.where((e) => line.indexOf(e) != -1).reduce(
