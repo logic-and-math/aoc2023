@@ -22,17 +22,19 @@ main() {
       toMatch.addAll(nameToDigit.keys);
     }
 
-    final firstMatch = toMatch.where((e) => line.indexOf(e) != -1).reduce(
-          (value, element) =>
-              line.indexOf(value) < line.indexOf(element) ? value : element,
-        );
+    final matches = [
+      for (var match in toMatch)
+        (
+          match: match,
+          first: line.indexOf(match),
+          last: line.lastIndexOf(match),
+        ),
+    ];
 
-    final lastMatch = toMatch.where((e) => line.lastIndexOf(e) != -1).reduce(
-          (value, element) =>
-              line.lastIndexOf(value) > line.lastIndexOf(element)
-                  ? value
-                  : element,
-        );
+    final firstMatch =
+        matches.where((e) => e.first != -1).min((e) => e.first).match;
+
+    final lastMatch = matches.max((e) => e.last).match;
 
     final first = nameToDigit[firstMatch] ?? firstMatch;
     final last = nameToDigit[lastMatch] ?? lastMatch;
@@ -45,7 +47,25 @@ main() {
       .reduce((value, element) => value + element));
 
   //part2
-  print(lines
-      .map((e) => lineValue(e, onlyNumbers: false))
-      .reduce((value, element) => value + element));
+  print(lines.map((e) => lineValue(e, onlyNumbers: false)).sum());
+}
+
+extension IterableExtensions<T> on Iterable<T> {
+  T max(Comparable Function(T) selector) {
+    return reduce((value, element) =>
+        selector(value).compareTo(selector(element)) > 0 ? value : element);
+  }
+
+  T min(Comparable Function(T) selector) {
+    return reduce((value, element) =>
+        selector(value).compareTo(selector(element)) < 0 ? value : element);
+  }
+
+  T sum({T Function(T, T)? selector = null}) {
+    if (selector == null || T is num) {
+      return reduce((value, element) => (value as num) + (element as num) as T);
+    } else {
+      return reduce((value, element) => selector(value, element));
+    }
+  }
 }
