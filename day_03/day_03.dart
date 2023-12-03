@@ -30,7 +30,7 @@ main() {
   }
 
   //better name would be numberPosRToAdjSymbolsPos
-  final numberPosRToAdjSymbols = {};
+  final numberPosRToAdjSymbols = <posRange, List<pos>>{};
   for (var posR in numbers.keys) {
     final adj = getAdjacentPositions(posR);
     final adjSymbols =
