@@ -33,7 +33,8 @@ main() {
   final numberPosRToAdjSymbols = {};
   for (var posR in numbers.keys) {
     final adj = getAdjacentPositions(posR);
-    final adjSymbols = [for (var p in adj) p];
+    final adjSymbols =
+        [for (var p in adj) p].where((p) => symbols.containsKey(p)).toList();
     if (adjSymbols.isNotEmpty) numberPosRToAdjSymbols[posR] = adjSymbols;
   }
 
