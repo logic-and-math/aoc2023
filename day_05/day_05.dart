@@ -10,7 +10,6 @@ typedef Range = ({int start, int end});
 
 void main() {
   late final List<int> seeds;
-  ;
   final Map<MapName, List<MapRange>> maps = {};
 
   var currentMapName = (source: "", dest: "");
@@ -89,34 +88,28 @@ void main() {
           return hasOverlap;
         });
 
-        if (mapRange != null) {
-          final overlapStart = max(mapRange.sStart, range.start);
-          final overlapEnd = min(mapRange.sEnd, range.end);
-
-          final distanceSinceStart = overlapStart - mapRange.sStart;
-          final destinationStart = mapRange.dStart + distanceSinceStart;
-          final destinationEnd = destinationStart + overlapEnd - overlapStart;
-
-          //first add the part that maps
-          final rangesFromRange = [
-            (start: destinationStart, end: destinationEnd)
-          ];
-          if (overlapStart > range.start) {
-            rangesFromRange.add((start: range.start, end: overlapStart - 1));
-          }
-          if (overlapEnd < range.end) {
-            rangesFromRange.add((start: overlapEnd + 1, end: range.end));
-          }
-
-          newRanges.addAll(rangesFromRange);
-        } else {
-          //if no map just add the range
+        if (mapRange == null) {
           newRanges.add(range);
+          continue;
+        }
+
+        final overlapStart = max(mapRange.sStart, range.start);
+        final overlapEnd = min(mapRange.sEnd, range.end);
+
+        final distanceSinceStart = overlapStart - mapRange.sStart;
+        final destinationStart = mapRange.dStart + distanceSinceStart;
+        final destinationEnd = destinationStart + overlapEnd - overlapStart;
+
+        newRanges.add((start: destinationStart, end: destinationEnd));
+        if (overlapStart > range.start) {
+          newRanges.add((start: range.start, end: overlapStart - 1));
+        }
+        if (overlapEnd < range.end) {
+          newRanges.add((start: overlapEnd + 1, end: range.end));
         }
       }
 
       ranges = newRanges;
-
       name = mapKey.dest;
     }
 
