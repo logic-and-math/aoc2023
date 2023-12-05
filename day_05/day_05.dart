@@ -13,7 +13,6 @@ void main() {
   final Map<MapName, List<MapRange>> maps = {};
 
   var currentMapName = (source: "", dest: "");
-
   for (var line in input.split("\n")) {
     if (line.contains("seeds")) {
       seeds = line
@@ -75,41 +74,69 @@ void main() {
 
     while (name != 'location') {
       final mapKey = maps.keys.firstWhere((mapName) => mapName.source == name);
-      final mapRanges = maps[mapKey]!;
 
-      final newRanges = <Range>[];
+      final mappedRanges = <Range>[];
+      final mappedRangesSources = <Range>[];
+      final unmappedRanges = <Range>[];
 
       for (var range in ranges) {
-        //find the range which overlaps, if exists
-        final mapRange = mapRanges.firstWhereOrNull((mapRange) {
+        //find the ranges which overlap
+        final mapRanges = maps[mapKey]!.where((mapRange) {
           final hasOverlap = mapRange.sStart >= range.start &&
                   mapRange.sStart <= range.end ||
               range.start >= mapRange.sStart && range.start <= mapRange.sEnd;
           return hasOverlap;
         });
 
-        if (mapRange == null) {
-          newRanges.add(range);
+        if (mapRanges.isEmpty) {
+          mappedRanges.add(range);
+          mappedRangesSources.add(range);
           continue;
         }
 
-        final overlapStart = max(mapRange.sStart, range.start);
-        final overlapEnd = min(mapRange.sEnd, range.end);
+        for (var mapRange in mapRanges) {
+          final overlapStart = max(mapRange.sStart, range.start);
+          final overlapEnd = min(mapRange.sEnd, range.end);
 
-        final distanceSinceStart = overlapStart - mapRange.sStart;
-        final destinationStart = mapRange.dStart + distanceSinceStart;
-        final destinationEnd = destinationStart + overlapEnd - overlapStart;
+          final distanceSinceStart = overlapStart - mapRange.sStart;
+          final destinationStart = mapRange.dStart + distanceSinceStart;
+          final destinationEnd = destinationStart + overlapEnd - overlapStart;
 
-        newRanges.add((start: destinationStart, end: destinationEnd));
-        if (overlapStart > range.start) {
-          newRanges.add((start: range.start, end: overlapStart - 1));
-        }
-        if (overlapEnd < range.end) {
-          newRanges.add((start: overlapEnd + 1, end: range.end));
+          mappedRanges.add((start: destinationStart, end: destinationEnd));
+          mappedRangesSources.add((start: overlapStart, end: overlapEnd));
         }
       }
 
-      ranges = newRanges;
+      mappedRangesSources.sort((a, b) => a.start - b.start);
+
+      var unmappedLimits = <int>[];
+      for (var mappedRange in mappedRangesSources) {
+        final start = mappedRange.start - 1;
+        final end = mappedRange.end + 1;
+        if (start <= end) {
+          unmappedLimits.addAll([start, end]);
+        }
+      }
+
+      final rangesBetweenMappedRanges = <Range>[
+        for (int i = 0; i < unmappedLimits.length; i += 2)
+          (start: unmappedLimits[i], end: unmappedLimits[i + 1])
+      ];
+
+      for (var range in ranges) {
+        for (var rangeBetween in rangesBetweenMappedRanges) {
+          final overlapStart = max(rangeBetween.start, range.start);
+          final overlapEnd = min(rangeBetween.end, range.end);
+
+          if (overlapStart <= overlapEnd) {
+            unmappedRanges.add((start: overlapStart, end: overlapEnd));
+          }
+        }
+      }
+      print(mappedRanges.length);
+      print("################################");
+
+      ranges = mappedRanges;
       name = mapKey.dest;
     }
 
