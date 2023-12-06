@@ -25,12 +25,9 @@ int nSolutions(int duration, int record) {
   //holdTime^2 - holdTime * duration + record < 0
   final b = -duration;
   final c = record;
-  var root1 = (-b + sqrt(pow(b, 2) - 4 * c)) / 2;
-  var root2 = (-b - sqrt(pow(b, 2) - 4 * c)) / 2;
+  final root1 = (-b + sqrt(pow(b, 2) - 4 * c)) / 2;
+  final root2 = (-b - sqrt(pow(b, 2) - 4 * c)) / 2;
 
-  final smallerRoot = min(root1, root2);
-  final largerRoot = max(root1, root2);
-
-  final nIntSolution = largerRoot.floor() - smallerRoot.ceil() + 1;
+  final nIntSolution = root1.floor() - root2.ceil() + 1;
   return nIntSolution;
 }
