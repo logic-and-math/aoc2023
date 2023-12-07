@@ -134,6 +134,7 @@ void main() {
         }
       }
       print(mappedRanges.length);
+      print(unmappedRanges.length);
       print("################################");
 
       ranges = mappedRanges;
