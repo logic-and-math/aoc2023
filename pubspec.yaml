@@ -5,3 +5,4 @@ environment:
 
 dependencies:
   collection: ^1.18.0
+  dart_numerics: ^0.0.6
